@@ -1,0 +1,47 @@
+name: Kubernetes deployment
+
+on:
+  push:
+    branches:
+      -main
+
+env:
+  FRONTEND_IMAGE: roshan33480/3tier-frontend
+  BACKEND_IMAGE: roshan33480/3tier-backend
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+
+    steps:
+    - name: Checkout code
+      users: actions/checkout@v4
+
+    - name: Create .env for client
+      run:
+        echo "REACT_APP_API_URL=${{secrets.API_URL}}"> application/client/.env
+      
+    - name: set up Docker Buildx
+      uses: docker/setup-buildx-actions@v3
+
+    - name: login to Dockerhub
+      uses: docker/login-actions@v3
+      with:
+        registry: docker.io
+        username: ${{secrets.DOCKER_USER}}
+        password: ${{secrets.DOCKER_PASSWORD}}
+
+    - name: Build and push Docker Image
+      uses: docker/build-push-actions@v5
+      with:
+        context: ./application/client
+        push: true
+        tags: ${{env.FRONTEND_IMAGE}}:latest
+
+    - name: Build and push Docker Image
+      uses: docker/build-push-actions@v5
+      with:
+        context: ./application/server
+        push: true
+        tags: ${{env.BACKEND_IMAGE}}:latest
