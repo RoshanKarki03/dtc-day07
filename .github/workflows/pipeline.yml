@@ -3,7 +3,7 @@ name: Kubernetes deployment
 on:
   push:
     branches:
-      -main
+      - main
 
 env:
   FRONTEND_IMAGE: roshan33480/3tier-frontend
@@ -45,4 +45,3 @@ jobs:
         context: ./application/server
         push: true
         tags: ${{env.BACKEND_IMAGE}}:latest
-        
